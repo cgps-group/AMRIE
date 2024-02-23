@@ -11,6 +11,12 @@ namespace Interpretation_CLI
 		static int Main(string[] args)
 		{
 			const char newLine = '\n';
+			// string[] args2 =
+			// {
+			//  	"SINGLE_INTERPRETATION", "/Users/ka10/code/-/AMRIE/Interpretation Engine/Resources/SampleConfig.json", "aba", "AMP_EM", "2", "out"
+			// };
+			//args = args2;
+
 			if (!(args.Length == 5 && args[0].ToUpperInvariant() == Constants.CommandLineModes.File) 
 				&& !(args.Length == 6 && args[0].ToUpperInvariant() == Constants.CommandLineModes.SingleInterpretation))
 			{
@@ -62,7 +68,7 @@ namespace Interpretation_CLI
 					string outputFile = args[5];
 
 					InterpretationConfiguration interpretationConfig =
-						InterpretationConfiguration.ReadConfiguration(configFile);
+						InterpretationConfiguration.DefaultConfiguration();
 
 					string interpretation =
 						IsolateInterpretation.GetSingleInterpretation(

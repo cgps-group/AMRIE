@@ -89,7 +89,7 @@ namespace AMR_Engine
 		/// List of breakpoints loaded from the text file resource.
 		/// </summary>
 		public static readonly List<Breakpoint> Breakpoints = 
-			LoadBreakpoints(Path.Join(Constants.SystemRootPath, "Resources", "Breakpoints.txt"));
+			LoadBreakpoints();
 
 		#endregion
 
@@ -423,70 +423,88 @@ namespace AMR_Engine
 		/// <param name="breakpointsTableFile"></param>
 		/// <returns></returns>
 		/// <exception cref="FileNotFoundException"></exception>
-		public static List<Breakpoint> LoadBreakpoints(string breakpointsTableFile)
+		public static List<Breakpoint> LoadBreakpoints(string breakpointsTableFile = null)
 		{
-			if (!string.IsNullOrWhiteSpace(breakpointsTableFile) && File.Exists(breakpointsTableFile))
+			if (string.IsNullOrWhiteSpace(breakpointsTableFile))
+			{
+				using (Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("AMR_Engine.Resources.Breakpoints.txt"))
+				using (StreamReader reader = new StreamReader(stream))
+				{
+					return LoadBreakpointsFromStreamReader(reader);
+				}
+			}
+			else if (File.Exists(breakpointsTableFile))
 			{
 				List<Breakpoint> breakpoints = new List<Breakpoint>();
 
 				using (StreamReader reader = new StreamReader(breakpointsTableFile))
 				{
-					string headerLine = reader.ReadLine();
-					Dictionary<string, int> headerMap = IO_Library.GetHeaders(headerLine);
-
-					while (!reader.EndOfStream)
-					{
-						string thisLine = reader.ReadLine();
-						string[] values = thisLine.Split(Constants.Delimiters.TabChar);
-
-						decimal tempR = decimal.Zero;
-						if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(R)]]))
-							tempR = decimal.Parse(values[headerMap[nameof(R)]], System.Globalization.CultureInfo.InvariantCulture);
-
-						decimal tempS = decimal.Zero;
-						if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(S)]]))
-							tempS = decimal.Parse(values[headerMap[nameof(S)]], System.Globalization.CultureInfo.InvariantCulture);
-
-						decimal tempECV = decimal.Zero;
-						if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(ECV_ECOFF)]]))
-							tempECV = decimal.Parse(values[headerMap[nameof(ECV_ECOFF)]], System.Globalization.CultureInfo.InvariantCulture);
-
-						DateTime tempEntered = DateTime.MinValue;
-						if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(DATE_ENTERED)]]))
-							tempEntered = DateTime.Parse(values[headerMap[nameof(DATE_ENTERED)]], System.Globalization.CultureInfo.InvariantCulture);
-
-						DateTime tempModified = DateTime.MinValue;
-						if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(DATE_MODIFIED)]]))
-							tempModified = DateTime.Parse(values[headerMap[nameof(DATE_MODIFIED)]], System.Globalization.CultureInfo.InvariantCulture);
-
-						Breakpoint newBreakpoint = new Breakpoint(values[headerMap[nameof(GUIDELINES)]], int.Parse(values[headerMap[nameof(YEAR)]], System.Globalization.CultureInfo.InvariantCulture),
-							values[headerMap[nameof(TEST_METHOD)]], values[headerMap[nameof(POTENCY)]], values[headerMap[nameof(ORGANISM_CODE)]],
-							values[headerMap[nameof(ORGANISM_CODE_TYPE)]], values[headerMap[nameof(BREAKPOINT_TYPE)]], values[headerMap[nameof(HOST)]],
-							values[headerMap[nameof(SITE_OF_INFECTION)]], values[headerMap[nameof(REFERENCE_TABLE)]], values[headerMap[nameof(WHONET_ABX_CODE)]],
-							values[headerMap[nameof(WHONET_TEST)]], tempR, values[headerMap[nameof(I)]],
-							values[headerMap[nameof(SDD)]], tempS, tempECV,
-							tempEntered, tempModified, values[headerMap[nameof(COMMENTS)]]);
-
-						breakpoints.Add(newBreakpoint);
-					}
+					return LoadBreakpointsFromStreamReader(reader);
 				}
-
-				return breakpoints;
 			}
-			else throw new FileNotFoundException(breakpointsTableFile);
+			else
+			{
+				throw new FileNotFoundException(breakpointsTableFile);
+			}
 		}
 
-		#endregion
+        private static List<Breakpoint> LoadBreakpointsFromStreamReader(StreamReader reader)
+        {
+            List<Breakpoint> breakpoints = new List<Breakpoint>();
 
-		#region Private
+            string headerLine = reader.ReadLine();
+            Dictionary<string, int> headerMap = IO_Library.GetHeaders(headerLine);
 
-		/// <summary>
-		/// We need to scan the list of breakpoint sites of infection to find the lowest sorting term on the prioritized list.
-		/// </summary>
-		/// <param name="prioritizedSitesOfInfection"></param>
-		/// <param name="breakpointSitesOfInfection"></param>
-		/// <returns></returns>
-		private static int GetIndex(List<string> prioritizedSitesOfInfection, string breakpointSitesOfInfection)
+            while (!reader.EndOfStream)
+                {
+                    string thisLine = reader.ReadLine();
+                    string[] values = thisLine.Split(Constants.Delimiters.TabChar);
+
+                    decimal tempR = decimal.Zero;
+                    if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(R)]]))
+                        tempR = decimal.Parse(values[headerMap[nameof(R)]], System.Globalization.CultureInfo.InvariantCulture);
+
+                    decimal tempS = decimal.Zero;
+                    if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(S)]]))
+                        tempS = decimal.Parse(values[headerMap[nameof(S)]], System.Globalization.CultureInfo.InvariantCulture);
+
+                    decimal tempECV = decimal.Zero;
+                    if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(ECV_ECOFF)]]))
+                        tempECV = decimal.Parse(values[headerMap[nameof(ECV_ECOFF)]], System.Globalization.CultureInfo.InvariantCulture);
+
+                    DateTime tempEntered = DateTime.MinValue;
+                    if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(DATE_ENTERED)]]))
+                        tempEntered = DateTime.Parse(values[headerMap[nameof(DATE_ENTERED)]], System.Globalization.CultureInfo.InvariantCulture);
+
+                    DateTime tempModified = DateTime.MinValue;
+                    if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(DATE_MODIFIED)]]))
+                        tempModified = DateTime.Parse(values[headerMap[nameof(DATE_MODIFIED)]], System.Globalization.CultureInfo.InvariantCulture);
+
+                    Breakpoint newBreakpoint = new Breakpoint(values[headerMap[nameof(GUIDELINES)]], int.Parse(values[headerMap[nameof(YEAR)]], System.Globalization.CultureInfo.InvariantCulture),
+                        values[headerMap[nameof(TEST_METHOD)]], values[headerMap[nameof(POTENCY)]], values[headerMap[nameof(ORGANISM_CODE)]],
+                        values[headerMap[nameof(ORGANISM_CODE_TYPE)]], values[headerMap[nameof(BREAKPOINT_TYPE)]], values[headerMap[nameof(HOST)]],
+                        values[headerMap[nameof(SITE_OF_INFECTION)]], values[headerMap[nameof(REFERENCE_TABLE)]], values[headerMap[nameof(WHONET_ABX_CODE)]],
+                        values[headerMap[nameof(WHONET_TEST)]], tempR, values[headerMap[nameof(I)]],
+                        values[headerMap[nameof(SDD)]], tempS, tempECV,
+                        tempEntered, tempModified, values[headerMap[nameof(COMMENTS)]]);
+
+                    breakpoints.Add(newBreakpoint);
+                }
+
+            return breakpoints;
+        }
+
+        #endregion
+
+        #region Private
+
+        /// <summary>
+        /// We need to scan the list of breakpoint sites of infection to find the lowest sorting term on the prioritized list.
+        /// </summary>
+        /// <param name="prioritizedSitesOfInfection"></param>
+        /// <param name="breakpointSitesOfInfection"></param>
+        /// <returns></returns>
+        private static int GetIndex(List<string> prioritizedSitesOfInfection, string breakpointSitesOfInfection)
 		{
 			List<string> breakpointSitesList = 
 				breakpointSitesOfInfection.

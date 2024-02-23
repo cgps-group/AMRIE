@@ -275,20 +275,13 @@ namespace AMR_Engine
 		/// </summary>
 		/// <returns></returns>
 		/// <exception cref="InvalidDataException"></exception>
-		/// <exception cref="FileNotFoundException"></exception>
 		private static List<ExpertInterpretationRule> LoadExpertInterpretationRules()
 		{
-			string expertRulesTableFile;
-			string relativePath = Path.Join("Resources", "ExpertInterpretationRules.txt");
-			if (string.IsNullOrWhiteSpace(Constants.SystemRootPath))
-				expertRulesTableFile = relativePath;
-			else
-				expertRulesTableFile = Path.Join(Constants.SystemRootPath, relativePath);
-
-			if (File.Exists(expertRulesTableFile))
+			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			using (Stream stream = assembly.GetManifestResourceStream("AMR_Engine.Resources.ExpertInterpretationRules.txt"))
 			{
 				List<ExpertInterpretationRule> allRules = new List<ExpertInterpretationRule>();
-				using (StreamReader reader = new StreamReader(expertRulesTableFile))
+				using (StreamReader reader = new StreamReader(stream))
 				{
 					string headerLine = reader.ReadLine();
 					Dictionary<string, int> headerMap = IO_Library.GetHeaders(headerLine);
@@ -351,7 +344,6 @@ namespace AMR_Engine
 
 				return allRules;
 			}
-			else throw new FileNotFoundException(expertRulesTableFile);
 		}
 
 		#endregion

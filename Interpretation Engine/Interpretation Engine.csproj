@@ -21,31 +21,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\Antibiotics.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\SampleUserDefinedBreakpoints.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Breakpoints.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\ExpertInterpretationRules.txt">
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</Content>
     <Content Include="Resources\ExpectedResistancePhenotypes.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ExpectedResistancePhenotypes.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Organisms.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\Breakpoints.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\QC_Ranges.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\SampleConfig.json">
@@ -65,6 +47,26 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Antibiotics.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Breakpoints.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\ExpectedResistancePhenotypes.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\ExpertInterpretationRules.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Organisms.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\QC_Ranges.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Update="Translations\Resources.resx">
       <CustomToolNamespace>Translations</CustomToolNamespace>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -72,8 +74,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <!-- <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;echo Attempting to sign binary...&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe&quot; sign /tr http://timestamp.sectigo.com /td sha256 /fd sha256 /a &quot;$(TargetDir)$(TargetName).dll&quot;&#xD;&#xA;) else (&#xD;&#xA;echo Signing skipped because we are not in Release mode.&#xD;&#xA;)" />
-  </Target>
+  </Target> -->
 
 </Project>

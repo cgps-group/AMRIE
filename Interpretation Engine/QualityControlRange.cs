@@ -176,18 +176,12 @@ namespace AMR_Engine
 		/// <exception cref="FileNotFoundException"></exception>
 		private static List<QualityControlRange> LoadQualityControlRanges()
 		{
-			string qualityControlTableFile;
-			string relativePath = Path.Join("Resources", "QC_Ranges.txt");
-			if (string.IsNullOrWhiteSpace(Constants.SystemRootPath))
-				qualityControlTableFile = relativePath;
-			else
-				qualityControlTableFile = Path.Join(Constants.SystemRootPath, relativePath);
-
-			if (!string.IsNullOrWhiteSpace(qualityControlTableFile) && File.Exists(qualityControlTableFile))
+			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			using (Stream stream = assembly.GetManifestResourceStream("AMR_Engine.Resources.QC_Ranges.txt"))
 			{
 				List<QualityControlRange> qcRanges = new List<QualityControlRange>();
 
-				using (StreamReader reader = new StreamReader(qualityControlTableFile))
+				using (StreamReader reader = new StreamReader(stream))
 				{
 					string headerLine = reader.ReadLine();
 					Dictionary<string, int> headerMap = IO_Library.GetHeaders(headerLine);
@@ -230,7 +224,6 @@ namespace AMR_Engine
 				
 				return qcRanges;
 			}
-			else throw new FileNotFoundException(qualityControlTableFile);
 		}
 
 		#endregion

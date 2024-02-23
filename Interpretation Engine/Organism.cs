@@ -125,17 +125,11 @@ namespace AMR_Engine
 		/// <exception cref="FileNotFoundException"></exception>
 		private static Dictionary<string, Organism> LoadCurrentOrganisms()
 		{
-			string organismsTableFile;
-			string relativePath = System.IO.Path.Join("Resources", "Organisms.txt");
-			if (string.IsNullOrWhiteSpace(Constants.SystemRootPath))
-				organismsTableFile = relativePath;
-			else
-				organismsTableFile = System.IO.Path.Join(Constants.SystemRootPath, relativePath);
-
-			if (File.Exists(organismsTableFile))
+			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			using (Stream stream = assembly.GetManifestResourceStream("AMR_Engine.Resources.Organisms.txt"))
 			{
 				Dictionary<string, Organism> currentOrgMap = new Dictionary<string, Organism>();
-				using (StreamReader reader = new StreamReader(organismsTableFile))
+				using (StreamReader reader = new StreamReader(stream))
 				{
 					string headerLine = reader.ReadLine();
 					Dictionary<string, int> headerMap = IO_Library.GetHeaders(headerLine);
@@ -182,7 +176,6 @@ namespace AMR_Engine
 
 				return currentOrgMap;
 			}
-			else throw new FileNotFoundException(organismsTableFile);
 		}
 
 		/// <summary>
@@ -192,17 +185,11 @@ namespace AMR_Engine
 		/// <exception cref="FileNotFoundException"></exception>
 		private static Dictionary<string, string> LoadMergedOrganisms()
 		{
-			string organismsTableFile;
-			string relativePath = Path.Join("Resources", "Organisms.txt");
-			if (string.IsNullOrWhiteSpace(Constants.SystemRootPath))
-				organismsTableFile = relativePath;
-			else
-				organismsTableFile = Path.Join(Constants.SystemRootPath, relativePath);
-
-			if (File.Exists(organismsTableFile))
+			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			using (Stream stream = assembly.GetManifestResourceStream("AMR_Engine.Resources.Organisms.txt"))
 			{
 				Dictionary<string, string> mergedOrganismMap = new Dictionary<string, string>();
-				using (StreamReader reader = new StreamReader(organismsTableFile))
+				using (StreamReader reader = new StreamReader(stream))
 				{
 					string headerLine = reader.ReadLine();
 					Dictionary<string, int> headerMap = IO_Library.GetHeaders(headerLine);
@@ -223,7 +210,6 @@ namespace AMR_Engine
 
 				return mergedOrganismMap;
 			}
-			else throw new FileNotFoundException(organismsTableFile);
 		}
 
 		#endregion

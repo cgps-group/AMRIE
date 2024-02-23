@@ -1,0 +1,1 @@
+time ./bin/Debug/net8.0/Interpretation\ CLI SINGLE_INTERPRETATION /data/Interpretation\ Engine/Resources/SampleConfig.json aba AMP_EM 2 out

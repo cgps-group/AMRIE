@@ -261,20 +261,13 @@ namespace AMR_Engine
 		/// Load the expected resistance (intrinsic resistance) rules from the text file.
 		/// </summary>
 		/// <returns></returns>
-		/// <exception cref="FileNotFoundException"></exception>
 		private static List<ExpectedResistancePhenotypeRule> LoadExpectedResistancePhenotypeRules()
 		{
-			string expectedResistancePhenotypesTableFile;
-			string relativePath = Path.Join("Resources", "ExpectedResistancePhenotypes.txt");
-			if (string.IsNullOrWhiteSpace(Constants.SystemRootPath))
-				expectedResistancePhenotypesTableFile = relativePath;
-			else
-				expectedResistancePhenotypesTableFile = Path.Join(Constants.SystemRootPath, relativePath);
-
-			if (File.Exists(expectedResistancePhenotypesTableFile))
+			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			using (Stream stream = assembly.GetManifestResourceStream("AMR_Engine.Resources.ExpectedResistancePhenotypes.txt"))
 			{
 				List<ExpectedResistancePhenotypeRule> expectedResistanceRules = new List<ExpectedResistancePhenotypeRule>();
-				using (StreamReader reader = new StreamReader(expectedResistancePhenotypesTableFile))
+				using (StreamReader reader = new StreamReader(stream))
 				{
 					string headerLine = reader.ReadLine();
 					Dictionary<string, int> headerMap = IO_Library.GetHeaders(headerLine);
@@ -307,7 +300,6 @@ namespace AMR_Engine
 
 				return expectedResistanceRules;
 			}
-			else throw new FileNotFoundException(expectedResistancePhenotypesTableFile);
 		}
 
 		#endregion

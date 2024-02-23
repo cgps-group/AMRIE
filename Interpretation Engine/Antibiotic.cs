@@ -306,55 +306,46 @@ namespace AMR_Engine
 		/// <exception cref="FileNotFoundException"></exception>
 		private static List<Antibiotic> LoadAntibiotics()
 		{
-			string antibioticsTableFile;
-			string relativePath = Path.Join("Resources", "Antibiotics.txt");
-			if (string.IsNullOrWhiteSpace(Constants.SystemRootPath))
-				antibioticsTableFile = relativePath;
-			else
-				antibioticsTableFile = Path.Join(Constants.SystemRootPath, relativePath);
-
-			if (File.Exists(antibioticsTableFile))
+			List<Antibiotic> antibiotics = new List<Antibiotic>();
+			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			using (Stream stream = assembly.GetManifestResourceStream("AMR_Engine.Resources.Antibiotics.txt"))
+			using (StreamReader reader = new StreamReader(stream))
 			{
-				List<Antibiotic> antibiotics = new List<Antibiotic>();
-				using (StreamReader reader = new StreamReader(antibioticsTableFile))
+				string headerLine = reader.ReadLine();
+				Dictionary<string, int> headerMap = IO_Library.GetHeaders(headerLine);
+
+				while (!reader.EndOfStream)
 				{
-					string headerLine = reader.ReadLine();
-					Dictionary<string, int> headerMap = IO_Library.GetHeaders(headerLine);
+					string thisLine = reader.ReadLine();
+					string[] values = thisLine.Split(Constants.Delimiters.TabChar);
 
-					while (!reader.EndOfStream)
-					{
-						string thisLine = reader.ReadLine();
-						string[] values = thisLine.Split(Constants.Delimiters.TabChar);
+					DateTime tempEntered = DateTime.MinValue;
+					if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(DATE_ENTERED)]]))
+						tempEntered = DateTime.Parse(values[headerMap[nameof(DATE_ENTERED)]], System.Globalization.CultureInfo.InvariantCulture);
 
-						DateTime tempEntered = DateTime.MinValue;
-						if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(DATE_ENTERED)]]))
-							tempEntered = DateTime.Parse(values[headerMap[nameof(DATE_ENTERED)]], System.Globalization.CultureInfo.InvariantCulture);
+					DateTime tempModified = DateTime.MinValue;
+					if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(DATE_MODIFIED)]]))
+						tempModified = DateTime.Parse(values[headerMap[nameof(DATE_MODIFIED)]], System.Globalization.CultureInfo.InvariantCulture);
 
-						DateTime tempModified = DateTime.MinValue;
-						if (!string.IsNullOrWhiteSpace(values[headerMap[nameof(DATE_MODIFIED)]]))
-							tempModified = DateTime.Parse(values[headerMap[nameof(DATE_MODIFIED)]], System.Globalization.CultureInfo.InvariantCulture);
+					Antibiotic newAntibiotic = new Antibiotic(values[headerMap[nameof(WHONET_ABX_CODE)]], values[headerMap[nameof(WHO_CODE)]], 
+						values[headerMap[nameof(DIN_CODE)]], values[headerMap[nameof(JAC_CODE)]], values[headerMap[nameof(EUCAST_CODE)]],
+						values[headerMap[nameof(USER_CODE)]], values[headerMap[nameof(ANTIBIOTIC)]], values[headerMap[nameof(GUIDELINES)]],
+						values[headerMap[nameof(CLSI)]] == X, values[headerMap[nameof(EUCAST)]] == X, values[headerMap[nameof(SFM)]] == X, 
+						values[headerMap[nameof(SRGA)]] == X, values[headerMap[nameof(BSAC)]] == X, values[headerMap[nameof(DIN)]] == X, 
+						values[headerMap[nameof(NEO)]] == X, values[headerMap[nameof(AFA)]] == X, values[headerMap[nameof(ABX_NUMBER)]], 
+						values[headerMap[nameof(POTENCY)]], values[headerMap[nameof(ATC_CODE)]], values[headerMap[nameof(CLASS)]], 
+						values[headerMap[nameof(PROF_CLASS)]], values[headerMap[nameof(CIA_CATEGORY)]],
+						values[headerMap[nameof(CLSI_ORDER)]], values[headerMap[nameof(EUCAST_ORDER)]], values[headerMap[nameof(HUMAN)]] == X,
+						values[headerMap[nameof(VETERINARY)]] == X, values[headerMap[nameof(ANIMAL_GP)]] == X, values[headerMap[nameof(LOINCCOMP)]],
+						values[headerMap[nameof(LOINCGEN)]], values[headerMap[nameof(LOINCDISK)]], values[headerMap[nameof(LOINCMIC)]],
+						values[headerMap[nameof(LOINCETEST)]], values[headerMap[nameof(LOINCSLOW)]], values[headerMap[nameof(LOINCAFB)]],
+						values[headerMap[nameof(LOINCSBT)]], values[headerMap[nameof(LOINCMLC)]], tempEntered, tempModified, values[headerMap[nameof(COMMENTS)]]);
 
-						Antibiotic newAntibiotic = new Antibiotic(values[headerMap[nameof(WHONET_ABX_CODE)]], values[headerMap[nameof(WHO_CODE)]], 
-							values[headerMap[nameof(DIN_CODE)]], values[headerMap[nameof(JAC_CODE)]], values[headerMap[nameof(EUCAST_CODE)]],
-							values[headerMap[nameof(USER_CODE)]], values[headerMap[nameof(ANTIBIOTIC)]], values[headerMap[nameof(GUIDELINES)]],
-							values[headerMap[nameof(CLSI)]] == X, values[headerMap[nameof(EUCAST)]] == X, values[headerMap[nameof(SFM)]] == X, 
-							values[headerMap[nameof(SRGA)]] == X, values[headerMap[nameof(BSAC)]] == X, values[headerMap[nameof(DIN)]] == X, 
-							values[headerMap[nameof(NEO)]] == X, values[headerMap[nameof(AFA)]] == X, values[headerMap[nameof(ABX_NUMBER)]], 
-							values[headerMap[nameof(POTENCY)]], values[headerMap[nameof(ATC_CODE)]], values[headerMap[nameof(CLASS)]], 
-							values[headerMap[nameof(PROF_CLASS)]], values[headerMap[nameof(CIA_CATEGORY)]],
-							values[headerMap[nameof(CLSI_ORDER)]], values[headerMap[nameof(EUCAST_ORDER)]], values[headerMap[nameof(HUMAN)]] == X,
-							values[headerMap[nameof(VETERINARY)]] == X, values[headerMap[nameof(ANIMAL_GP)]] == X, values[headerMap[nameof(LOINCCOMP)]],
-							values[headerMap[nameof(LOINCGEN)]], values[headerMap[nameof(LOINCDISK)]], values[headerMap[nameof(LOINCMIC)]],
-							values[headerMap[nameof(LOINCETEST)]], values[headerMap[nameof(LOINCSLOW)]], values[headerMap[nameof(LOINCAFB)]],
-							values[headerMap[nameof(LOINCSBT)]], values[headerMap[nameof(LOINCMLC)]], tempEntered, tempModified, values[headerMap[nameof(COMMENTS)]]);
+					antibiotics.Add(newAntibiotic);
+				}
+			}				
 
-						antibiotics.Add(newAntibiotic);
-					}
-				}				
-
-				return antibiotics;
-			}
-			else throw new FileNotFoundException(antibioticsTableFile);
+			return antibiotics;
 		}
 
 		#endregion
